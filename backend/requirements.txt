@@ -1,0 +1,11 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+psycopg2-binary==2.9.9        # PostgreSQL driver
+sqlalchemy==2.0.34            # ORM (optional, but recommended)
+pandas==2.2.3
+numpy==1.26.4
+scikit-learn==1.5.2
+statsmodels==0.14.4           # ARIMA model implementation
+APScheduler==3.10.4           # For cron-like scheduled jobs
+python-dotenv==1.0.1          # For environment variables (.env)
+requests==2.32.3              # For calling external APIs
