@@ -1,1 +1,0 @@
-psql -h air-quality-db.cj8au0o8mjxc.eu-north-1.rds.amazonaws.com -p 5432 -U aq_admin -d air-quality-db (password: Samiksha052005)
