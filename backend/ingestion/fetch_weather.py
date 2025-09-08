@@ -75,7 +75,7 @@ DB_CONFIG = {
     "password": os.getenv("DB_PASSWORD"),
 }
 
-CITY = "Pune"
+CITY = "Delhi"
 BASE_URL = "http://api.weatherapi.com/v1/history.json"
 
 
@@ -84,7 +84,7 @@ def fetch_weather_last_6hrs(city):
     date_str = now.strftime("%Y-%m-%d")
 
     params = {"key": API_KEY, "q": city, "dt": date_str}
-    response = requests.get(BASE_URL, params=params, timeout=30)
+    response = requests.get(BASE_URL, params=params, timeout=120)
     response.raise_for_status()
     data = response.json()
 
@@ -95,7 +95,7 @@ def fetch_weather_last_6hrs(city):
 
     # Take only the last 6 hours (relative to current hour)
     current_hour = now.hour
-    last_6hrs = [h for h in hours_data if current_hour - 6 <= int(h["time"].split(" ")[1].split(":")[0]) <= current_hour]
+    last_6hrs = [h for h in hours_data if current_hour - 24 <= int(h["time"].split(" ")[1].split(":")[0]) <= current_hour]
 
     results = []
     for h in last_6hrs:

@@ -14,7 +14,7 @@ DB_CONFIG = {
     "password": os.getenv("DB_PASSWORD"),
 }
 
-CITY = "Pune"
+CITY = "Delhi"
 BASE_URL = "https://api.data.gov.in/resource/3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69"  # AQI dataset ID
 
 
@@ -23,7 +23,7 @@ def fetch_aqi():
         "api-key": API_KEY,
         "format": "json",
         "filters[country]": "India",
-        "filters[state]": "Maharashtra",
+        # "filters[state]": "Gujarat",
         "filters[city]": CITY,
         "limit": 1000,
     }
