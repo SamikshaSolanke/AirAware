@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality Visualizer - Real-time Environmental Monitoring</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌤️</text></svg>">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">🌤️ AirViz</div>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="mobile-menu-toggle">☰</div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="container">
+                <h1>Air Quality Visualizer</h1>
+                <p>Advanced real-time environmental monitoring with granular air quality forecasting and comprehensive weather analytics</p>
+                
+                <div class="location-input">
+                    <input type="text" id="locationInput" placeholder="Enter city name (e.g., New York, London, Tokyo)" autocomplete="off">
+                    <button id="getWeatherBtn" onclick="getWeatherData()">
+                        <span class="btn-text">Get Weather</span>
+                        <span class="btn-loading" style="display: none;">Loading...</span>
+                    </button>
+                </div>
+                
+                <div class="error-message" id="errorMessage" style="display: none;"></div>
+            </div>
+        </section>
+
+        <section class="container">
+            <div class="weather-dashboard" id="weatherDashboard" style="display: none;">
+                <div class="dashboard-header">
+                    <h2>Real-time Weather Conditions</h2>
+                    <div id="locationName" class="location-display"></div>
+                    <div id="lastUpdated" class="last-updated"></div>
+                    <div id="demoNotice" class="demo-notice" style="display: none;">
+                        <span>🧪 Demo Mode - Add your WeatherAPI key for real data</span>
+                    </div>
+                </div>
+                
+                <div class="weather-grid">
+                    <div class="weather-card temperature-card">
+                        <div class="weather-icon">🌡️</div>
+                        <div class="weather-value" id="temperature">--°C</div>
+                        <div class="weather-label">Temperature</div>
+                        <div class="weather-trend" id="tempTrend"></div>
+                    </div>
+                    
+                    <div class="weather-card heat-index-card">
+                        <div class="weather-icon">🔥</div>
+                        <div class="weather-value" id="heatIndex">--°C</div>
+                        <div class="weather-label">Heat Index</div>
+                        <div class="weather-description">Feels like temperature</div>
+                    </div>
+                    
+                    <div class="weather-card condition-card">
+                        <div class="weather-icon" id="conditionIcon">🌤️</div>
+                        <div class="weather-value" id="condition">--</div>
+                        <div class="weather-label">Conditions</div>
+                        <div class="weather-description">Current weather</div>
+                    </div>
+                    
+                    <div class="weather-card humidity-card">
+                        <div class="weather-icon">💧</div>
+                        <div class="weather-value" id="humidity">--%</div>
+                        <div class="weather-label">Humidity</div>
+                        <div class="humidity-bar">
+                            <div class="humidity-fill" id="humidityFill"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="weather-card cloud-card">
+                        <div class="weather-icon">☁️</div>
+                        <div class="weather-value" id="cloud">--%</div>
+                        <div class="weather-label">Cloud Cover</div>
+                        <div class="cloud-bar">
+                            <div class="cloud-fill" id="cloudFill"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="weather-card uv-card">
+                        <div class="weather-icon">☀️</div>
+                        <div class="weather-value" id="uv">--</div>
+                        <div class="weather-label">UV Index</div>
+                        <div class="uv-description" id="uvDescription">UV Level</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2>Powerful Environmental Intelligence</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Real-time Weather Monitoring</h3>
+                        <p>Comprehensive weather data including temperature, humidity, cloud cover, and UV index with live updates every minute</p>
+                        <div class="feature-status active">✅ Active</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🌍</div>
+                        <h3>Global Coverage</h3>
+                        <p>Access environmental data from over 3 million locations worldwide with precise GPS-based monitoring</p>
+                        <div class="feature-status active">✅ Active</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Lightning Fast Updates</h3>
+                        <p>Real-time data processing with sub-second latency for the most current environmental conditions</p>
+                        <div class="feature-status active">✅ Active</div>
+                    </div>
+                    
+                    <div class="feature-card coming-soon-card">
+                        <div class="feature-icon">🌬️</div>
+                        <h3>Air Quality Index</h3>
+                        <p>Comprehensive AQI monitoring including PM2.5, PM10, CO, NO2, SO2, and O3 levels with health recommendations</p>
+                        <div class="feature-status coming-soon">🚧 Coming Soon</div>
+                    </div>
+                    
+                    <div class="feature-card coming-soon-card">
+                        <div class="feature-icon">🔮</div>
+                        <h3>Predictive Forecasting</h3>
+                        <p>Advanced machine learning algorithms for accurate 7-day air quality and weather predictions</p>
+                        <div class="feature-status coming-soon">🚧 Coming Soon</div>
+                    </div>
+                    
+                    <div class="feature-card coming-soon-card">
+                        <div class="feature-icon">📈</div>
+                        <h3>Advanced Visualizations</h3>
+                        <p>Interactive maps, trend charts, and heatmaps for comprehensive environmental data analysis</p>
+                        <div class="feature-status coming-soon">🚧 Coming Soon</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <div class="about-content">
+                    <h2>About the Project</h2>
+                    <p>The Air Quality Visualizer is an advanced environmental monitoring platform designed to provide granular, real-time, and predictive air quality information. Built with cutting-edge technology and powered by comprehensive weather APIs, our platform delivers actionable insights for better environmental awareness.</p>
+                    
+                    <div class="tech-stack">
+                        <h3>Technology Stack</h3>
+                        <div class="tech-badges">
+                            <span class="tech-badge">FastAPI</span>
+                            <span class="tech-badge">Python</span>
+                            <span class="tech-badge">HTML5</span>
+                            <span class="tech-badge">CSS3</span>
+                            <span class="tech-badge">JavaScript</span>
+                            <span class="tech-badge">WeatherAPI</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Air Quality Visualizer. Built with ❤️ for environmental awareness.</p>
+        </div>
+    </footer>
+
+    <script>
+        // API configuration
+        const API_BASE_URL = '';  // FastAPI will serve from same origin
+
+        // Weather data fetching
+        async function getWeatherData() {
+            const location = document.getElementById('locationInput').value.trim();
+            const button = document.getElementById('getWeatherBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (!location) {
+                showError('Please enter a city name');
+                return;
+            }
+
+            // Show loading state
+            setLoadingState(true);
+            hideError();
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/weather/${encodeURIComponent(location)}`);
+                
+                if (!response.ok) {
+                    throw new Error('Location not found or service unavailable');
+                }
+                
+                const data = await response.json();
+                displayWeatherData(data);
+                
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+                showError('Unable to fetch weather data. Please check the city name and try again.');
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        function displayWeatherData(data) {
+            const dashboard = document.getElementById('weatherDashboard');
+            
+            // Update location info
+            document.getElementById('locationName').textContent = 
+                `${data.location.name}, ${data.location.country}`;
+            
+            if (data.current.last_updated) {
+                document.getElementById('lastUpdated').textContent = 
+                    `Last updated: ${new Date(data.current.last_updated).toLocaleString()}`;
+            }
+
+            // Show demo notice if using demo data
+            const demoNotice = document.getElementById('demoNotice');
+            if (data.is_demo) {
+                demoNotice.style.display = 'block';
+            } else {
+                demoNotice.style.display = 'none';
+            }
+            
+            // Update weather values
+            document.getElementById('temperature').textContent = `${data.current.temp_c}°C`;
+            document.getElementById('heatIndex').textContent = `${data.current.heatindex_c}°C`;
+            document.getElementById('condition').textContent = data.current.condition.text;
+            document.getElementById('humidity').textContent = `${data.current.humidity}%`;
+            document.getElementById('cloud').textContent = `${data.current.cloud}%`;
+            document.getElementById('uv').textContent = data.current.uv;
+
+            // Update visual elements
+            updateHumidityBar(data.current.humidity);
+            updateCloudBar(data.current.cloud);
+            updateUVDescription(data.current.uv);
+            updateConditionIcon(data.current.condition.text);
+
+            // Show dashboard
+            dashboard.style.display = 'block';
+            dashboard.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateHumidityBar(humidity) {
+            const fill = document.getElementById('humidityFill');
+            fill.style.width = `${humidity}%`;
+        }
+
+        function updateCloudBar(cloud) {
+            const fill = document.getElementById('cloudFill');
+            fill.style.width = `${cloud}%`;
+        }
+
+        function updateUVDescription(uv) {
+            const description = document.getElementById('uvDescription');
+            if (uv <= 2) description.textContent = 'Low';
+            else if (uv <= 5) description.textContent = 'Moderate';
+            else if (uv <= 7) description.textContent = 'High';
+            else if (uv <= 10) description.textContent = 'Very High';
+            else description.textContent = 'Extreme';
+        }
+
+        function updateConditionIcon(condition) {
+            const icon = document.getElementById('conditionIcon');
+            const conditionLower = condition.toLowerCase();
+            
+            if (conditionLower.includes('sunny') || conditionLower.includes('clear')) {
+                icon.textContent = '☀️';
+            } else if (conditionLower.includes('cloud')) {
+                icon.textContent = '☁️';
+            } else if (conditionLower.includes('rain')) {
+                icon.textContent = '🌧️';
+            } else if (conditionLower.includes('snow')) {
+                icon.textContent = '❄️';
+            } else if (conditionLower.includes('storm')) {
+                icon.textContent = '⛈️';
+            } else {
+                icon.textContent = '🌤️';
+            }
+        }
+
+        function setLoadingState(loading) {
+            const button = document.getElementById('getWeatherBtn');
+            const btnText = button.querySelector('.btn-text');
+            const btnLoading = button.querySelector('.btn-loading');
+            
+            if (loading) {
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'inline';
+                button.disabled = true;
+            } else {
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+                button.disabled = false;
+            }
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            setTimeout(hideError, 5000);  // Auto-hide after 5 seconds
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Event listeners
+        document.getElementById('locationInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                getWeatherData();
+            }
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Mobile menu toggle (for future mobile optimization)
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

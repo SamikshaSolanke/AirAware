@@ -75,7 +75,7 @@ DB_CONFIG = {
     "password": os.getenv("DB_PASSWORD"),
 }
 
-CITY = "Delhi"
+CITY = "Chennai"
 BASE_URL = "http://api.weatherapi.com/v1/history.json"
 
 

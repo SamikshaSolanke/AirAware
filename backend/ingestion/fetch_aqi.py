@@ -14,7 +14,7 @@ DB_CONFIG = {
     "password": os.getenv("DB_PASSWORD"),
 }
 
-CITY = "Delhi"
+CITY = "Chennai"
 BASE_URL = "https://api.data.gov.in/resource/3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69"  # AQI dataset ID
 
 
