@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Air Quality Visualizer - Real-time Environmental Monitoring</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style2.css') }}">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌤️</text></svg>">
 </head>
 <body>
@@ -14,8 +14,7 @@
                 <div class="logo">🌤️ AirViz</div>
                 <ul class="nav-links">
                     <li><a href="#home">Home</a></li>
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#about">About</a></li>
+                    <li><a href="#dashboard">Dashboard</a></li>
                     <li><a href="#contact">Contact</a></li>
                 </ul>
                 <div class="mobile-menu-toggle">☰</div>
@@ -27,12 +26,12 @@
         <section id="home" class="hero">
             <div class="container">
                 <h1>Air Quality Visualizer</h1>
-                <p>Advanced real-time environmental monitoring with granular air quality forecasting and comprehensive weather analytics</p>
+                <p>Real-time environmental monitoring with comprehensive air quality index (AQI) tracking and detailed particle level analysis</p>
                 
                 <div class="location-input">
                     <input type="text" id="locationInput" placeholder="Enter city name (e.g., New York, London, Tokyo)" autocomplete="off">
-                    <button id="getWeatherBtn" onclick="getWeatherData()">
-                        <span class="btn-text">Get Weather</span>
+                    <button id="getDataBtn" onclick="getEnvironmentalData()">
+                        <span class="btn-text">Get Environmental Data</span>
                         <span class="btn-loading" style="display: none;">Loading...</span>
                     </button>
                 </div>
@@ -41,37 +40,38 @@
             </div>
         </section>
 
-        <section class="container">
-            <div class="weather-dashboard" id="weatherDashboard" style="display: none;">
+        <section class="container" id="dashboard">
+            <div class="environmental-dashboard" id="environmentalDashboard" style="display: none;">
                 <div class="dashboard-header">
-                    <h2>Real-time Weather Conditions</h2>
+                    <h2>Real-time Environmental Conditions</h2>
                     <div id="locationName" class="location-display"></div>
                     <div id="lastUpdated" class="last-updated"></div>
                     <div id="demoNotice" class="demo-notice" style="display: none;">
-                        <span>🧪 Demo Mode - Add your WeatherAPI key for real data</span>
+                        <span>🧪 Demo Mode - Add your API keys for real data</span>
                     </div>
                 </div>
                 
+                <!-- Weather Data Section -->
+                <div class="section-header">
+                    <h3>🌤️ Weather Conditions</h3>
+                </div>
                 <div class="weather-grid">
                     <div class="weather-card temperature-card">
                         <div class="weather-icon">🌡️</div>
                         <div class="weather-value" id="temperature">--°C</div>
                         <div class="weather-label">Temperature</div>
-                        <div class="weather-trend" id="tempTrend"></div>
                     </div>
                     
                     <div class="weather-card heat-index-card">
                         <div class="weather-icon">🔥</div>
                         <div class="weather-value" id="heatIndex">--°C</div>
                         <div class="weather-label">Heat Index</div>
-                        <div class="weather-description">Feels like temperature</div>
                     </div>
                     
                     <div class="weather-card condition-card">
                         <div class="weather-icon" id="conditionIcon">🌤️</div>
                         <div class="weather-value" id="condition">--</div>
                         <div class="weather-label">Conditions</div>
-                        <div class="weather-description">Current weather</div>
                     </div>
                     
                     <div class="weather-card humidity-card">
@@ -99,74 +99,81 @@
                         <div class="uv-description" id="uvDescription">UV Level</div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <section id="features" class="features">
-            <div class="container">
-                <h2>Powerful Environmental Intelligence</h2>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">📊</div>
-                        <h3>Real-time Weather Monitoring</h3>
-                        <p>Comprehensive weather data including temperature, humidity, cloud cover, and UV index with live updates every minute</p>
-                        <div class="feature-status active">✅ Active</div>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">🌍</div>
-                        <h3>Global Coverage</h3>
-                        <p>Access environmental data from over 3 million locations worldwide with precise GPS-based monitoring</p>
-                        <div class="feature-status active">✅ Active</div>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">⚡</div>
-                        <h3>Lightning Fast Updates</h3>
-                        <p>Real-time data processing with sub-second latency for the most current environmental conditions</p>
-                        <div class="feature-status active">✅ Active</div>
-                    </div>
-                    
-                    <div class="feature-card coming-soon-card">
-                        <div class="feature-icon">🌬️</div>
-                        <h3>Air Quality Index</h3>
-                        <p>Comprehensive AQI monitoring including PM2.5, PM10, CO, NO2, SO2, and O3 levels with health recommendations</p>
-                        <div class="feature-status coming-soon">🚧 Coming Soon</div>
-                    </div>
-                    
-                    <div class="feature-card coming-soon-card">
-                        <div class="feature-icon">🔮</div>
-                        <h3>Predictive Forecasting</h3>
-                        <p>Advanced machine learning algorithms for accurate 7-day air quality and weather predictions</p>
-                        <div class="feature-status coming-soon">🚧 Coming Soon</div>
-                    </div>
-                    
-                    <div class="feature-card coming-soon-card">
-                        <div class="feature-icon">📈</div>
-                        <h3>Advanced Visualizations</h3>
-                        <p>Interactive maps, trend charts, and heatmaps for comprehensive environmental data analysis</p>
-                        <div class="feature-status coming-soon">🚧 Coming Soon</div>
+                <!-- Air Quality Section -->
+                <div class="section-header">
+                    <h3>🌬️ Air Quality Index (AQI)</h3>
+                </div>
+                <div class="aqi-overview">
+                    <div class="aqi-main-card">
+                        <div class="aqi-circle" id="aqiCircle">
+                            <div class="aqi-value" id="aqiValue">--</div>
+                            <div class="aqi-category" id="aqiCategory">Loading...</div>
+                        </div>
+                        <div class="aqi-info">
+                            <div class="dominant-pollutant">
+                                <span class="label">Dominant Pollutant:</span>
+                                <span id="dominantPollutant">--</span>
+                            </div>
+                            <div class="air-quality-updated">
+                                <span class="label">Last Updated:</span>
+                                <span id="aqiLastUpdated">--</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <section id="about" class="about">
-            <div class="container">
-                <div class="about-content">
-                    <h2>About the Project</h2>
-                    <p>The Air Quality Visualizer is an advanced environmental monitoring platform designed to provide granular, real-time, and predictive air quality information. Built with cutting-edge technology and powered by comprehensive weather APIs, our platform delivers actionable insights for better environmental awareness.</p>
+                <!-- Pollutant Details -->
+                <div class="section-header">
+                    <h3>🔬 Pollutant Levels</h3>
+                </div>
+                <div class="pollutant-grid">
+                    <div class="pollutant-card pm25-card">
+                        <div class="pollutant-icon">🔴</div>
+                        <div class="pollutant-name">PM2.5</div>
+                        <div class="pollutant-value" id="pm25Value">-- μg/m³</div>
+                        <div class="pollutant-aqi">AQI: <span id="pm25AQI">--</span></div>
+                        <div class="pollutant-description">Fine particles</div>
+                    </div>
                     
-                    <div class="tech-stack">
-                        <h3>Technology Stack</h3>
-                        <div class="tech-badges">
-                            <span class="tech-badge">FastAPI</span>
-                            <span class="tech-badge">Python</span>
-                            <span class="tech-badge">HTML5</span>
-                            <span class="tech-badge">CSS3</span>
-                            <span class="tech-badge">JavaScript</span>
-                            <span class="tech-badge">WeatherAPI</span>
-                        </div>
+                    <div class="pollutant-card pm10-card">
+                        <div class="pollutant-icon">🟠</div>
+                        <div class="pollutant-name">PM10</div>
+                        <div class="pollutant-value" id="pm10Value">-- μg/m³</div>
+                        <div class="pollutant-aqi">AQI: <span id="pm10AQI">--</span></div>
+                        <div class="pollutant-description">Coarse particles</div>
+                    </div>
+                    
+                    <div class="pollutant-card ozone-card">
+                        <div class="pollutant-icon">🟡</div>
+                        <div class="pollutant-name">O₃</div>
+                        <div class="pollutant-value" id="ozoneValue">-- μg/m³</div>
+                        <div class="pollutant-aqi">AQI: <span id="ozoneAQI">--</span></div>
+                        <div class="pollutant-description">Ground-level ozone</div>
+                    </div>
+                    
+                    <div class="pollutant-card no2-card">
+                        <div class="pollutant-icon">🟤</div>
+                        <div class="pollutant-name">NO₂</div>
+                        <div class="pollutant-value" id="no2Value">-- μg/m³</div>
+                        <div class="pollutant-aqi">AQI: <span id="no2AQI">--</span></div>
+                        <div class="pollutant-description">Nitrogen dioxide</div>
+                    </div>
+                    
+                    <div class="pollutant-card so2-card">
+                        <div class="pollutant-icon">🟣</div>
+                        <div class="pollutant-name">SO₂</div>
+                        <div class="pollutant-value" id="so2Value">-- μg/m³</div>
+                        <div class="pollutant-aqi">AQI: <span id="so2AQI">--</span></div>
+                        <div class="pollutant-description">Sulfur dioxide</div>
+                    </div>
+                    
+                    <div class="pollutant-card co-card">
+                        <div class="pollutant-icon">⚫</div>
+                        <div class="pollutant-name">CO</div>
+                        <div class="pollutant-value" id="coValue">-- mg/m³</div>
+                        <div class="pollutant-aqi">AQI: <span id="coAQI">--</span></div>
+                        <div class="pollutant-description">Carbon monoxide</div>
                     </div>
                 </div>
             </div>
@@ -183,11 +190,9 @@
         // API configuration
         const API_BASE_URL = '';  // FastAPI will serve from same origin
 
-        // Weather data fetching
-        async function getWeatherData() {
+        // Environmental data fetching
+        async function getEnvironmentalData() {
             const location = document.getElementById('locationInput').value.trim();
-            const button = document.getElementById('getWeatherBtn');
-            const errorMessage = document.getElementById('errorMessage');
             
             if (!location) {
                 showError('Please enter a city name');
@@ -199,41 +204,78 @@
             hideError();
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/weather/${encodeURIComponent(location)}`);
-                
-                if (!response.ok) {
-                    throw new Error('Location not found or service unavailable');
+                // Fetch both weather and AQI data simultaneously
+                const [weatherResponse, aqiResponse] = await Promise.all([
+                    fetch(`${API_BASE_URL}/api/weather/${encodeURIComponent(location)}`),
+                    fetch(`${API_BASE_URL}/api/aqi/${encodeURIComponent(location)}`)
+                ]);
+
+                let weatherData = null;
+                let aqiData = null;
+
+                // Handle weather data
+                if (weatherResponse.ok) {
+                    weatherData = await weatherResponse.json();
+                }
+
+                // Handle AQI data
+                if (aqiResponse.ok) {
+                    aqiData = await aqiResponse.json();
+                }
+
+                // Display the data if at least one API returned valid data
+                if (weatherData || aqiData) {
+                    displayEnvironmentalData(weatherData, aqiData);
+                } else {
+                    throw new Error('Unable to fetch environmental data for this location');
                 }
                 
-                const data = await response.json();
-                displayWeatherData(data);
-                
             } catch (error) {
-                console.error('Error fetching weather data:', error);
-                showError('Unable to fetch weather data. Please check the city name and try again.');
+                console.error('Error fetching environmental data:', error);
+                showError('Unable to fetch environmental data. Please check the city name and try again.');
             } finally {
                 setLoadingState(false);
             }
         }
 
-        function displayWeatherData(data) {
-            const dashboard = document.getElementById('weatherDashboard');
+        function displayEnvironmentalData(weatherData, aqiData) {
+            const dashboard = document.getElementById('environmentalDashboard');
             
-            // Update location info
-            document.getElementById('locationName').textContent = 
-                `${data.location.name}, ${data.location.country}`;
+            // Determine if we're in demo mode
+            const isDemoMode = (weatherData?.is_demo) || (aqiData?.is_demo);
             
-            if (data.current.last_updated) {
-                document.getElementById('lastUpdated').textContent = 
-                    `Last updated: ${new Date(data.current.last_updated).toLocaleString()}`;
-            }
-
             // Show demo notice if using demo data
             const demoNotice = document.getElementById('demoNotice');
-            if (data.is_demo) {
-                demoNotice.style.display = 'block';
-            } else {
-                demoNotice.style.display = 'none';
+            demoNotice.style.display = isDemoMode ? 'block' : 'none';
+
+            // Update location info
+            if (weatherData?.location) {
+                document.getElementById('locationName').textContent = 
+                    `${weatherData.location.name}, ${weatherData.location.country}`;
+            } else if (aqiData?.stations?.[0]) {
+                document.getElementById('locationName').textContent = 
+                    `${aqiData.stations[0].city}, ${aqiData.stations[0].state}`;
+            }
+
+            // Display weather data
+            if (weatherData?.current) {
+                displayWeatherData(weatherData);
+            }
+
+            // Display AQI data
+            if (aqiData?.stations?.[0]) {
+                displayAQIData(aqiData.stations[0]);
+            }
+
+            // Show dashboard
+            dashboard.style.display = 'block';
+            dashboard.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function displayWeatherData(data) {
+            if (data.current.last_updated) {
+                document.getElementById('lastUpdated').textContent = 
+                    `Weather updated: ${new Date(data.current.last_updated).toLocaleString()}`;
             }
             
             // Update weather values
@@ -249,52 +291,119 @@
             updateCloudBar(data.current.cloud);
             updateUVDescription(data.current.uv);
             updateConditionIcon(data.current.condition.text);
+        }
 
-            // Show dashboard
-            dashboard.style.display = 'block';
-            dashboard.scrollIntoView({ behavior: 'smooth' });
+        function displayAQIData(station) {
+            // Update main AQI display
+            const aqiValue = station.AQI || 0;
+            document.getElementById('aqiValue').textContent = aqiValue;
+            
+            // Update AQI category and circle color
+            const category = getAQICategory(aqiValue);
+            document.getElementById('aqiCategory').textContent = category.text;
+            document.getElementById('aqiCircle').className = `aqi-circle ${category.class}`;
+
+            // Update dominant pollutant
+            if (station.aqiInfo?.pollutant) {
+                document.getElementById('dominantPollutant').textContent = station.aqiInfo.pollutant;
+            }
+
+            // Update last updated time
+            if (station.updatedAt) {
+                document.getElementById('aqiLastUpdated').textContent = 
+                    new Date(station.updatedAt).toLocaleString();
+            }
+
+            // Update individual pollutant values
+            updatePollutantValue('pm25', station.PM25);
+            updatePollutantValue('pm10', station.PM10);
+            updatePollutantValue('ozone', station.OZONE);
+            updatePollutantValue('no2', station.NO2);
+            updatePollutantValue('so2', station.SO2);
+            updatePollutantValue('co', station.CO);
+        }
+
+        function updatePollutantValue(pollutant, data) {
+            if (data) {
+                const valueElement = document.getElementById(`${pollutant}Value`);
+                const aqiElement = document.getElementById(`${pollutant}AQI`);
+                
+                if (valueElement && aqiElement) {
+                    // CO is typically in mg/m³, others in μg/m³
+                    const unit = pollutant === 'co' ? 'mg/m³' : 'μg/m³';
+                    valueElement.textContent = `${data.concentration || 0} ${unit}`;
+                    aqiElement.textContent = data.AQI || 0;
+                    
+                    // Update card color based on AQI
+                    const card = valueElement.closest('.pollutant-card');
+                    if (card) {
+                        const category = getAQICategory(data.AQI || 0);
+                        card.className = `pollutant-card ${pollutant}-card ${category.class}`;
+                    }
+                }
+            }
+        }
+
+        function getAQICategory(aqi) {
+            if (aqi <= 50) {
+                return { text: 'Good', class: 'good' };
+            } else if (aqi <= 100) {
+                return { text: 'Moderate', class: 'moderate' };
+            } else if (aqi <= 150) {
+                return { text: 'Unhealthy for Sensitive', class: 'unhealthy-sensitive' };
+            } else if (aqi <= 200) {
+                return { text: 'Unhealthy', class: 'unhealthy' };
+            } else if (aqi <= 300) {
+                return { text: 'Very Unhealthy', class: 'very-unhealthy' };
+            } else {
+                return { text: 'Hazardous', class: 'hazardous' };
+            }
         }
 
         function updateHumidityBar(humidity) {
             const fill = document.getElementById('humidityFill');
-            fill.style.width = `${humidity}%`;
+            if (fill) fill.style.width = `${humidity}%`;
         }
 
         function updateCloudBar(cloud) {
             const fill = document.getElementById('cloudFill');
-            fill.style.width = `${cloud}%`;
+            if (fill) fill.style.width = `${cloud}%`;
         }
 
         function updateUVDescription(uv) {
             const description = document.getElementById('uvDescription');
-            if (uv <= 2) description.textContent = 'Low';
-            else if (uv <= 5) description.textContent = 'Moderate';
-            else if (uv <= 7) description.textContent = 'High';
-            else if (uv <= 10) description.textContent = 'Very High';
-            else description.textContent = 'Extreme';
+            if (description) {
+                if (uv <= 2) description.textContent = 'Low';
+                else if (uv <= 5) description.textContent = 'Moderate';
+                else if (uv <= 7) description.textContent = 'High';
+                else if (uv <= 10) description.textContent = 'Very High';
+                else description.textContent = 'Extreme';
+            }
         }
 
         function updateConditionIcon(condition) {
             const icon = document.getElementById('conditionIcon');
-            const conditionLower = condition.toLowerCase();
-            
-            if (conditionLower.includes('sunny') || conditionLower.includes('clear')) {
-                icon.textContent = '☀️';
-            } else if (conditionLower.includes('cloud')) {
-                icon.textContent = '☁️';
-            } else if (conditionLower.includes('rain')) {
-                icon.textContent = '🌧️';
-            } else if (conditionLower.includes('snow')) {
-                icon.textContent = '❄️';
-            } else if (conditionLower.includes('storm')) {
-                icon.textContent = '⛈️';
-            } else {
-                icon.textContent = '🌤️';
+            if (icon) {
+                const conditionLower = condition.toLowerCase();
+                
+                if (conditionLower.includes('sunny') || conditionLower.includes('clear')) {
+                    icon.textContent = '☀️';
+                } else if (conditionLower.includes('cloud')) {
+                    icon.textContent = '☁️';
+                } else if (conditionLower.includes('rain')) {
+                    icon.textContent = '🌧️';
+                } else if (conditionLower.includes('snow')) {
+                    icon.textContent = '❄️';
+                } else if (conditionLower.includes('storm')) {
+                    icon.textContent = '⛈️';
+                } else {
+                    icon.textContent = '🌤️';
+                }
             }
         }
 
         function setLoadingState(loading) {
-            const button = document.getElementById('getWeatherBtn');
+            const button = document.getElementById('getDataBtn');
             const btnText = button.querySelector('.btn-text');
             const btnLoading = button.querySelector('.btn-loading');
             
@@ -323,7 +432,7 @@
         // Event listeners
         document.getElementById('locationInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                getWeatherData();
+                getEnvironmentalData();
             }
         });
 
@@ -341,7 +450,7 @@
             });
         });
 
-        // Mobile menu toggle (for future mobile optimization)
+        // Mobile menu toggle
         document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
             document.querySelector('.nav-links').classList.toggle('active');
         });
