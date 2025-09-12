@@ -75,39 +75,62 @@ DB_CONFIG = {
     "password": os.getenv("DB_PASSWORD"),
 }
 
-CITY = "Chennai"
+CITY = "Delhi"
 BASE_URL = "http://api.weatherapi.com/v1/history.json"
 
 
-def fetch_weather_last_6hrs(city):
-    now = datetime.now()  # local time
-    date_str = now.strftime("%Y-%m-%d")
+def fetch_weather_last_48hrs(city):
+    now = datetime.now()
+    two_days_ago = now - timedelta(days=2)
+    one_day_ago = now - timedelta(days=1)
+    
+    all_hours = []
 
-    params = {"key": API_KEY, "q": city, "dt": date_str}
-    response = requests.get(BASE_URL, params=params, timeout=120)
-    response.raise_for_status()
-    data = response.json()
+    # Fetch data for the day before yesterday
+    params_two_days_ago = {"key": API_KEY, "q": city, "dt": two_days_ago.strftime("%Y-%m-%d")}
+    response_two_days_ago = requests.get(BASE_URL, params=params_two_days_ago, timeout=120)
+    response_two_days_ago.raise_for_status()
+    data_two_days_ago = response_two_days_ago.json()
+    if "forecast" in data_two_days_ago:
+        all_hours.extend(data_two_days_ago["forecast"]["forecastday"][0]["hour"])
 
-    if "forecast" not in data:
-        return []
+    # Fetch data for yesterday
+    params_one_day_ago = {"key": API_KEY, "q": city, "dt": one_day_ago.strftime("%Y-%m-%d")}
+    response_one_day_ago = requests.get(BASE_URL, params=params_one_day_ago, timeout=120)
+    response_one_day_ago.raise_for_status()
+    data_one_day_ago = response_one_day_ago.json()
+    if "forecast" in data_one_day_ago:
+        all_hours.extend(data_one_day_ago["forecast"]["forecastday"][0]["hour"])
 
-    hours_data = data["forecast"]["forecastday"][0]["hour"]
+    # Fetch data for today
+    params_today = {"key": API_KEY, "q": city, "dt": now.strftime("%Y-%m-%d")}
+    response_today = requests.get(BASE_URL, params=params_today, timeout=120)
+    response_today.raise_for_status()
+    data_today = response_today.json()
+    if "forecast" in data_today:
+        all_hours.extend(data_today["forecast"]["forecastday"][0]["hour"])
+    
+    # Correct filtering logic
+    forty_eight_hours_ago = now - timedelta(hours=48)
+    
+    last_48hrs_data = []
+    for h in all_hours:
+        time_str = h["time"]
+        # The API returns a date and time string, e.g., "2025-09-11 15:00"
+        # The format string needs to match this.
+        h_datetime = datetime.strptime(time_str, "%Y-%m-%d %H:%M")
+        
+        if h_datetime >= forty_eight_hours_ago and h_datetime <= now:
+            last_48hrs_data.append({
+                "city": city,
+                "temperature": h["temp_c"],
+                "humidity": h["humidity"],
+                "pressure": h["pressure_mb"],
+                "description": h["condition"]["text"],
+                "time": time_str
+            })
 
-    # Take only the last 6 hours (relative to current hour)
-    current_hour = now.hour
-    last_6hrs = [h for h in hours_data if current_hour - 24 <= int(h["time"].split(" ")[1].split(":")[0]) <= current_hour]
-
-    results = []
-    for h in last_6hrs:
-        results.append({
-            "city": city,
-            "temperature": h["temp_c"],
-            "humidity": h["humidity"],
-            "pressure": h["pressure_mb"],
-            "description": h["condition"]["text"],
-            "time": h["time"]
-        })
-    return results
+    return last_48hrs_data
 
 
 def insert_into_db(records):
@@ -142,8 +165,8 @@ def insert_into_db(records):
 
 if __name__ == "__main__":
     try:
-        print(f"Fetching weather data for last 6 hrs in {CITY}...")
-        data = fetch_weather_last_6hrs(CITY)
+        print(f"Fetching weather data for the last 48 hours in {CITY}...")
+        data = fetch_weather_last_48hrs(CITY)
         insert_into_db(data)
         print(f"Inserted {len(data)} weather records for {CITY}")
     except Exception as e:
