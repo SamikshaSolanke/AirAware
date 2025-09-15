@@ -174,7 +174,7 @@
 
 import os
 import requests
-import psycopg2
+import pg8000
 from datetime import datetime
 
 # ✅ Use Lambda environment variables
@@ -183,13 +183,13 @@ WEATHER_API_KEY = os.environ["WEATHER_API_KEY"]
 DB_CONFIG = {
     "host": os.environ["DB_HOST"],
     "port": os.environ["DB_PORT"],
-    "dbname": os.environ["DB_NAME"],
+    "database": os.environ["DB_NAME"],
     "user": os.environ["DB_USER"],
     "password": os.environ["DB_PASSWORD"],
 }
 
 CITIES = ["Delhi", "Pune", "Mumbai", "Chennai", "Surat"]
-BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
+BASE_URL = "http://api.weatherapi.com/v1/history.json"
 
 
 def fetch_weather(city):
@@ -204,7 +204,7 @@ def fetch_weather(city):
 
 
 def insert_into_db(city, weather_data):
-    conn = psycopg2.connect(**DB_CONFIG)
+    conn = pg8000.connect(**DB_CONFIG)
     cur = conn.cursor()
 
     try:

@@ -10,3 +10,6 @@ APScheduler==3.10.4           # For cron-like scheduled jobs
 python-dotenv==1.0.1          # For environment variables (.env)
 requests==2.32.3              # For calling external APIs
 jinja2
+pg8000
+boto3
+statsmodels>=0.14
