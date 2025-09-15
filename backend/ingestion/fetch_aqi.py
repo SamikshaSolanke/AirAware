@@ -43,6 +43,18 @@ def safe_float(value):
         return None
 
 
+from datetime import datetime
+
+def parse_datetime(dt_str):
+    """Convert DD-MM-YYYY HH:MM:SS → datetime object"""
+    if not dt_str or dt_str in ("NA", "null", ""):
+        return None
+    try:
+        return datetime.strptime(dt_str, "%d-%m-%Y %H:%M:%S")
+    except ValueError:
+        return None
+
+
 def insert_into_db(records):
     if not records:
         print("⚠️ No records found.")
@@ -59,7 +71,7 @@ def insert_into_db(records):
             safe_float(rec.get("min_value")),
             safe_float(rec.get("max_value")),
             safe_float(rec.get("avg_value")),
-            rec.get("last_update"),
+            parse_datetime(rec.get("last_update")),  # ✅ FIXED here
         )
         for rec in records
     ]

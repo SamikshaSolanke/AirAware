@@ -11,6 +11,19 @@ CREATE TABLE IF NOT EXISTS air_quality (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS google_air_quality (
+    latitude NUMERIC(10, 6) NOT NULL,
+    longitude NUMERIC(10, 6) NOT NULL,
+    data_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    aqi INT,
+    co NUMERIC(10, 2),
+    no2 NUMERIC(10, 2),
+    so2 NUMERIC(10, 2),
+    pm10 NUMERIC(10, 2),
+    pm2_5 NUMERIC(10, 2),
+    PRIMARY KEY (latitude, longitude, data_time)
+);
+
 -- 2. Raw Weather Data
 CREATE TABLE IF NOT EXISTS weather (
     id SERIAL PRIMARY KEY,
@@ -83,3 +96,4 @@ CREATE INDEX IF NOT EXISTS idx_aqi_cleaned_city_time ON air_quality_cleaned(city
 CREATE INDEX IF NOT EXISTS idx_weather_cleaned_city_time ON weather_cleaned(city, timestamp);
 CREATE INDEX IF NOT EXISTS idx_aqi_forecast_city_time ON air_quality_forecasts(city, forecast_timestamp);
 CREATE INDEX IF NOT EXISTS idx_weather_forecast_city_time ON weather_forecasts(city, forecast_timestamp);
+
