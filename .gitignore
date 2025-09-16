@@ -1,0 +1,79 @@
+# ----------------------------
+# Python
+# ----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.pickle
+*.db
+*.sqlite3
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Logs and temp files
+*.log
+*.out
+*.tmp
+*.swp
+
+# ----------------------------
+# FastAPI / Backend
+# ----------------------------
+# Ignore uvicorn access/error logs if generated
+access.log
+error.log
+
+# ----------------------------
+# Frontend
+# ----------------------------
+# Node dependencies (if any in future)
+node_modules/
+npm-debug.log*
+
+# Build artifacts
+dist/
+build/
+
+# ----------------------------
+# Docker
+# ----------------------------
+*.dockerfile
+*.tar
+*.bak
+
+# ----------------------------
+# AWS / SageMaker
+# ----------------------------
+# AWS credentials/config (always keep safe)
+*.csv
+*.json
+.aws/
+credentials
+
+# SageMaker model artifacts
+*.tar.gz
+model/
+output/
+
+# ----------------------------
+# OS Specific
+# ----------------------------
+.DS_Store
+Thumbs.db
+
+# ----------------------------
+# IDE Specific
+# ----------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
