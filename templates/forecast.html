@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-Day Forecast - Air Quality Visualizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style2.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">🌤️ AirViz</div>
+                <ul class="nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/weather">Weather</a></li>
+                    <li><a href="/aqi">Air Quality</a></li>
+                    <li><a href="/forecast">Forecast</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>📊 3-Day Forecast</h1>
+                <p>Weather and air quality predictions for major Indian cities</p>
+                
+                <div class="city-selector">
+                    <button onclick="loadForecast('pune')" class="city-btn">Pune</button>
+                    <button onclick="loadForecast('mumbai')" class="city-btn">Mumbai</button>
+                    <button onclick="loadForecast('chennai')" class="city-btn">Chennai</button>
+                    <button onclick="loadForecast('surat')" class="city-btn">Surat</button>
+                    <button onclick="loadForecast('delhi')" class="city-btn active">Delhi</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="environmental-dashboard" id="forecastDashboard">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h2 id="cityName">Delhi Forecast</h2>
+                    <div class="demo-notice">
+                        📊 Hardcoded forecast data for demonstration
+                    </div>
+                </div>
+
+                <div class="forecast-container" id="forecastContainer">
+                    <!-- Forecast cards will be populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let currentCity = 'delhi';
+
+        async function loadForecast(city) {
+            currentCity = city;
+            
+            // Update active button
+            document.querySelectorAll('.city-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            try {
+                const response = await fetch(`/api/forecast/${city}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    updateForecastDisplay(data);
+                } else {
+                    throw new Error(data.detail || 'Failed to fetch forecast data');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error fetching forecast data: ' + error.message);
+            }
+        }
+
+        function updateForecastDisplay(data) {
+            document.getElementById('cityName').textContent = `${data.location.name} Forecast`;
+            
+            const container = document.getElementById('forecastContainer');
+            container.innerHTML = '';
+
+            data.forecast.forecastday.forEach((day, index) => {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'forecast-day-card';
+                
+                const date = new Date(day.date);
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                
+                dayCard.innerHTML = `
+                    <div class="forecast-header">
+                        <h3>${dayName}</h3>
+                        <div class="forecast-date">${day.date}</div>
+                    </div>
+                    
+                    <div class="forecast-content">
+                        <div class="weather-forecast">
+                            <h4>🌤️ Weather</h4>
+                            <div class="weather-info">
+                                <div class="temp-range">
+                                    <span class="max-temp">${day.day.maxtemp_c}°C</span>
+                                    <span class="temp-separator">/</span>
+                                    <span class="min-temp">${day.day.mintemp_c}°C</span>
+                                </div>
+                                <div class="condition">${day.day.condition.text}</div>
+                                <div class="humidity">Humidity: ${day.day.avghumidity}%</div>
+                                <div class="uv">UV Index: ${day.day.uv}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="pollutant-forecast">
+                            <h4>🌬️ Air Quality</h4>
+                            <div class="pollutant-info">
+                                ${day.pollutants ? Object.entries(day.pollutants).map(([pollutant, data]) => `
+                                    <div class="pollutant-item">
+                                        <span class="pollutant-name">${pollutant}:</span>
+                                        <span class="pollutant-conc">${data.concentration} μg/m³</span>
+                                        <span class="pollutant-aqi">(AQI: ${data.AQI})</span>
+                                    </div>
+                                `).join('') : '<div>No pollutant data available</div>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(dayCard);
+            });
+        }
+
+        // Load Delhi forecast on page load
+        window.onload = () => loadForecast('delhi');
+    </script>
+</body>
+</html>
+

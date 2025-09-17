@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Conditions - Air Quality Visualizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style2.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">🌤️ AirViz</div>
+                <ul class="nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/weather">Weather</a></li>
+                    <li><a href="/aqi">Air Quality</a></li>
+                    <li><a href="/forecast">Forecast</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>🌤️ Weather Conditions</h1>
+                <div class="location-input">
+                    <input type="text" id="locationInput" placeholder="Enter city name" value="Delhi">
+                    <button onclick="getWeatherData()" id="searchButton">🔍 Get Weather</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="environmental-dashboard" id="weatherDashboard" style="display: none;">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h2>Weather Conditions</h2>
+                    <div class="location-display" id="locationDisplay">--</div>
+                    <div class="last-updated" id="lastUpdated">Last updated: --</div>
+                    <div class="demo-notice" id="demoNotice" style="display: none;">
+                        🧪 Demo Mode - Add your API keys for real data
+                    </div>
+                </div>
+
+                <div class="weather-grid">
+                    <div class="weather-card temperature-card">
+                        <div class="weather-icon">🌡️</div>
+                        <div class="weather-value" id="temperature">--°C</div>
+                        <div class="weather-label">Temperature</div>
+                    </div>
+
+                    <div class="weather-card heat-index-card">
+                        <div class="weather-icon">🔥</div>
+                        <div class="weather-value" id="heatIndex">--°C</div>
+                        <div class="weather-label">Heat Index</div>
+                    </div>
+
+                    <div class="weather-card condition-card">
+                        <div class="weather-icon">🌤️</div>
+                        <div class="weather-value" id="condition">--</div>
+                        <div class="weather-label">Conditions</div>
+                    </div>
+
+                    <div class="weather-card humidity-card">
+                        <div class="weather-icon">💧</div>
+                        <div class="weather-value" id="humidity">--%</div>
+                        <div class="weather-label">Humidity</div>
+                        <div class="humidity-bar">
+                            <div class="humidity-fill" id="humidityFill"></div>
+                        </div>
+                    </div>
+
+                    <div class="weather-card cloud-card">
+                        <div class="weather-icon">☁️</div>
+                        <div class="weather-value" id="cloud">--%</div>
+                        <div class="weather-label">Cloud Cover</div>
+                        <div class="cloud-bar">
+                            <div class="cloud-fill" id="cloudFill"></div>
+                        </div>
+                    </div>
+
+                    <div class="weather-card uv-card">
+                        <div class="weather-icon">☀️</div>
+                        <div class="weather-value" id="uv">--</div>
+                        <div class="weather-label">UV Index</div>
+                        <div class="uv-description" id="uvDescription">UV Level</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        async function getWeatherData() {
+            const location = document.getElementById('locationInput').value.trim();
+            if (!location) return;
+
+            const searchButton = document.getElementById('searchButton');
+            searchButton.disabled = true;
+            searchButton.textContent = '🔄 Loading...';
+
+            try {
+                const response = await fetch(`/api/weather/${encodeURIComponent(location)}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    updateWeatherDisplay(data);
+                    document.getElementById('weatherDashboard').style.display = 'block';
+                } else {
+                    throw new Error(data.detail || 'Failed to fetch weather data');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error fetching weather data: ' + error.message);
+            } finally {
+                searchButton.disabled = false;
+                searchButton.textContent = '🔍 Get Weather';
+            }
+        }
+
+        function updateWeatherDisplay(data) {
+            const { location, current, is_demo } = data;
+
+            document.getElementById('locationDisplay').textContent = 
+                `${location.name}, ${location.country}`;
+            document.getElementById('lastUpdated').textContent = 
+                `Last updated: ${current.last_updated}`;
+            
+            document.getElementById('demoNotice').style.display = is_demo ? 'block' : 'none';
+
+            document.getElementById('temperature').textContent = `${current.temp_c}°C`;
+            document.getElementById('heatIndex').textContent = `${current.heatindex_c}°C`;
+            document.getElementById('condition').textContent = current.condition.text;
+            document.getElementById('humidity').textContent = `${current.humidity}%`;
+            document.getElementById('cloud').textContent = `${current.cloud}%`;
+            document.getElementById('uv').textContent = current.uv;
+
+            // Update progress bars
+            document.getElementById('humidityFill').style.width = `${current.humidity}%`;
+            document.getElementById('cloudFill').style.width = `${current.cloud}%`;
+
+            // Update UV description
+            const uvValue = current.uv;
+            let uvDesc = 'Low';
+            if (uvValue >= 8) uvDesc = 'Very High';
+            else if (uvValue >= 6) uvDesc = 'High';
+            else if (uvValue >= 3) uvDesc = 'Moderate';
+
+            document.getElementById('uvDescription').textContent = uvDesc;
+        }
+
+        // Load data for Delhi on page load
+        window.onload = () => getWeatherData();
+    </script>
+</body>
+</html>

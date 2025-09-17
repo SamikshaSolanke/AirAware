@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality Index - Air Quality Visualizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style2.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">🌤️ AirViz</div>
+                <ul class="nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/weather">Weather</a></li>
+                    <li><a href="/aqi">Air Quality</a></li>
+                    <li><a href="/forecast">Forecast</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>🌬️ Air Quality Index</h1>
+                <div class="location-input">
+                    <input type="text" id="locationInput" placeholder="Enter city name" value="Delhi">
+                    <button onclick="getAQIData()" id="searchButton">🔍 Get AQI</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="environmental-dashboard" id="aqiDashboard" style="display: none;">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h2>Air Quality Index (AQI)</h2>
+                    <div class="location-display" id="locationDisplay">--</div>
+                    <div class="last-updated" id="lastUpdated">Last updated: --</div>
+                    <div class="demo-notice" id="demoNotice" style="display: none;">
+                        🧪 Demo Mode - Add your API keys for real data
+                    </div>
+                </div>
+
+                <div class="aqi-overview">
+                    <div class="aqi-main-card">
+                        <div class="aqi-circle" id="aqiCircle">
+                            <div class="aqi-value" id="aqiValue">--</div>
+                            <div class="aqi-category" id="aqiCategory">Loading...</div>
+                        </div>
+                        <div class="aqi-info">
+                            <div class="dominant-pollutant">
+                                <span class="label">Dominant Pollutant:</span>
+                                <span id="dominantPollutant">--</span>
+                            </div>
+                            <div class="air-quality-updated">
+                                <span class="label">Last Updated:</span>
+                                <span id="airQualityUpdated">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <h3>🔬 Pollutant Levels</h3>
+                </div>
+
+                <div class="pollutant-grid" id="pollutantGrid">
+                    <!-- Pollutant cards will be populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        async function getAQIData() {
+            const location = document.getElementById('locationInput').value.trim();
+            if (!location) return;
+
+            const searchButton = document.getElementById('searchButton');
+            searchButton.disabled = true;
+            searchButton.textContent = '🔄 Loading...';
+
+            try {
+                const response = await fetch(`/api/aqi/${encodeURIComponent(location)}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    updateAQIDisplay(data);
+                    document.getElementById('aqiDashboard').style.display = 'block';
+                } else {
+                    throw new Error(data.detail || 'Failed to fetch AQI data');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error fetching AQI data: ' + error.message);
+            } finally {
+                searchButton.disabled = false;
+                searchButton.textContent = '🔍 Get AQI';
+            }
+        }
+
+        function updateAQIDisplay(data) {
+            const station = data.stations[0];
+            const { is_demo } = data;
+
+            document.getElementById('locationDisplay').textContent = 
+                `${station.city}, ${station.state}`;
+            document.getElementById('lastUpdated').textContent = 
+                `Last updated: ${new Date(station.updatedAt).toLocaleString()}`;
+            
+            document.getElementById('demoNotice').style.display = is_demo ? 'block' : 'none';
+
+            // Update AQI circle
+            const aqiValue = station.AQI;
+            const aqiCategory = getAQICategory(aqiValue);
+            
+            document.getElementById('aqiValue').textContent = aqiValue;
+            document.getElementById('aqiCategory').textContent = aqiCategory.name;
+            
+            const aqiCircle = document.getElementById('aqiCircle');
+            aqiCircle.className = `aqi-circle ${aqiCategory.class}`;
+
+            document.getElementById('dominantPollutant').textContent = station.aqiInfo.pollutant;
+            document.getElementById('airQualityUpdated').textContent = 
+                new Date(station.updatedAt).toLocaleString();
+
+            // Update pollutant grid
+            updatePollutantGrid(station);
+        }
+
+        function updatePollutantGrid(station) {
+            const pollutants = [
+                { name: 'PM2.5', icon: '🔴', data: station.PM25, unit: 'μg/m³', desc: 'Fine particles' },
+                { name: 'PM10', icon: '🟠', data: station.PM10, unit: 'μg/m³', desc: 'Coarse particles' },
+                { name: 'O₃', icon: '🔵', data: station.OZONE, unit: 'μg/m³', desc: 'Ground-level ozone' },
+                { name: 'NO₂', icon: '🟡', data: station.NO2, unit: 'μg/m³', desc: 'Nitrogen dioxide' },
+                { name: 'SO₂', icon: '🟢', data: station.SO2, unit: 'μg/m³', desc: 'Sulfur dioxide' },
+                { name: 'CO', icon: '⚫', data: station.CO, unit: 'mg/m³', desc: 'Carbon monoxide' }
+            ];
+
+            const grid = document.getElementById('pollutantGrid');
+            grid.innerHTML = '';
+
+            pollutants.forEach(pollutant => {
+                if (pollutant.data) {
+                    const card = document.createElement('div');
+                    const category = getAQICategory(pollutant.data.AQI);
+                    
+                    card.className = `pollutant-card ${category.class}`;
+                    card.innerHTML = `
+                        <div class="pollutant-icon">${pollutant.icon}</div>
+                        <div class="pollutant-name">${pollutant.name}</div>
+                        <div class="pollutant-value">${pollutant.data.concentration} ${pollutant.unit}</div>
+                        <div class="pollutant-aqi">AQI: ${pollutant.data.AQI}</div>
+                        <div class="pollutant-description">${pollutant.desc}</div>
+                    `;
+                    grid.appendChild(card);
+                }
+            });
+        }
+
+        function getAQICategory(aqi) {
+            if (aqi <= 50) return { name: 'Good', class: 'good' };
+            if (aqi <= 100) return { name: 'Moderate', class: 'moderate' };
+            if (aqi <= 150) return { name: 'Unhealthy for Sensitive Groups', class: 'unhealthy-sensitive' };
+            if (aqi <= 200) return { name: 'Unhealthy', class: 'unhealthy' };
+            if (aqi <= 300) return { name: 'Very Unhealthy', class: 'very-unhealthy' };
+            return { name: 'Hazardous', class: 'hazardous' };
+        }
+
+        // Load data for Delhi on page load
+        window.onload = () => getAQIData();
+    </script>
+</body>
+</html>
